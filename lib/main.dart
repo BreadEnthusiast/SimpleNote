@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/material.dart';
 import 'noteScreen.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
@@ -162,17 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 for (Note? note in notes)
                   GestureDetector(
                       onTap: () {
-                        if (note != null){
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => NoteScreen(
-                                    onThemeChanged: onThemeChanged,
-                                      initialNote: note,
-                                  )
-                              )
-                          );
-                        }
+                        // We'll use it eventually, let's leave it empty for now
                       },
                       child: Container(
                           padding: const EdgeInsets.all(8.0),

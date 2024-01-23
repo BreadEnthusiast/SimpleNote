@@ -13,8 +13,7 @@ class Note {
 
 class NoteScreen extends StatefulWidget {
   final Function(ThemeData) onThemeChanged;
-  final Note? initialNote;
-  const NoteScreen({Key? key, required this.onThemeChanged, this.initialNote}) : super(key: key);
+  const NoteScreen({Key? key, required this.onThemeChanged}) : super(key: key);
 
   @override
   _NoteScreenState createState() => _NoteScreenState();
@@ -50,11 +49,6 @@ class _NoteScreenState extends State<NoteScreen> {
   void initState() {
     super.initState();
     _loadSelectedTheme();
-
-    if (widget.initialNote != null) {
-      titleController.text = widget.initialNote!.title;
-      noteController.text = _readNoteFromFile(widget.initialNote!.filePath);
-    }
   }
 
   String _readNoteFromFile(String filePath) {
@@ -139,13 +133,18 @@ class _NoteScreenState extends State<NoteScreen> {
     String title = titleController.text;
     String note = noteController.text;
 
+    if (title.isEmpty) {
+      return;
+    }
+
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String notesFolderPath = '${documentsDirectory.path}/noteFiles';
 
     await Directory(notesFolderPath).create(recursive: true);
 
-    String fileName = DateTime.now().toIso8601String().replaceAll(':', '');
-    File noteFile = File('$notesFolderPath/$fileName.txt');
+    String sanitizedTitle = title.replaceAll(RegExp(r'[^\w\s]'), '');
+
+    File noteFile = File('$notesFolderPath/$sanitizedTitle.txt');
 
     await noteFile.writeAsString('$title\n$note');
     print('Note saved to: ${noteFile.path}');
