@@ -4,12 +4,6 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'dart:async';
 
-class Note {
-  final String title;
-  final String filePath;
-
-  Note({required this.title, required this.filePath});
-}
 
 class NoteScreen extends StatefulWidget {
   final Function(ThemeData) onThemeChanged;
@@ -43,16 +37,10 @@ class _NoteScreenState extends State<NoteScreen> {
     ),
   ];
 
-  Timer? _checkTypingTimer;
-
   @override
   void initState() {
     super.initState();
     _loadSelectedTheme();
-  }
-
-  String _readNoteFromFile(String filePath) {
-    return File(filePath).readAsStringSync();
   }
 
   // Load selected theme from shared preferences
@@ -118,9 +106,6 @@ class _NoteScreenState extends State<NoteScreen> {
                   controller: noteController,
                   maxLines: null,
                   style: const TextStyle(color: Colors.black),
-                  onChanged: (String value) {
-                    resetTimer();
-                  }
                 ),
               )
             )
@@ -128,37 +113,6 @@ class _NoteScreenState extends State<NoteScreen> {
         )
       ),
     );
-  }
-  Future<void> _saveNote() async {
-    String title = titleController.text;
-    String note = noteController.text;
-
-    if (title.isEmpty) {
-      return;
-    }
-
-    Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String notesFolderPath = '${documentsDirectory.path}/noteFiles';
-
-    await Directory(notesFolderPath).create(recursive: true);
-
-    String sanitizedTitle = title.replaceAll(RegExp(r'[^\w\s]'), '');
-
-    File noteFile = File('$notesFolderPath/$sanitizedTitle.txt');
-
-    await noteFile.writeAsString('$title\n$note');
-    print('Note saved to: ${noteFile.path}');
-  }
-
-  startTimer() {
-    _checkTypingTimer = Timer(const Duration(milliseconds: 600), () {
-      _saveNote();
-    });
-  }
-
-  resetTimer() {
-    _checkTypingTimer?.cancel();
-    startTimer();
   }
 
   String _getThemeName(ThemeData theme) {

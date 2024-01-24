@@ -34,13 +34,6 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class Note {
-  final String title;
-  final String filePath;
-
-  Note({required this.title, required this.filePath});
-}
-
 class _MyHomePageState extends State<MyHomePage> {
   final List<ThemeData> availableThemes = [
     ThemeData(
@@ -68,13 +61,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   late ThemeData selectedTheme;
-  List<Note?> notes = [];
 
   @override
   void initState() {
     super.initState();
     _loadSelectedTheme();
-    _loadNotes();
   }
 
   // Load selected theme from shared preferences
@@ -95,32 +86,6 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       selectedTheme = newTheme;
     });
-  }
-
-  Future<void> _loadNotes() async {
-    List<Note> loadedNotes = [];
-
-    Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String notesFolderPath = '${documentsDirectory.path}/noteFiles';
-
-    if (await Directory(notesFolderPath).exists()) {
-      List<FileSystemEntity> noteFiles = Directory(notesFolderPath).listSync();
-
-      for (FileSystemEntity file in noteFiles) {
-        String title = await _readTitleFromFile(file);
-        loadedNotes.add(Note(title: title, filePath: file.path));
-      }
-    }
-
-    setState(() {
-      notes = loadedNotes;
-    });
-  }
-
-  Future<String> _readTitleFromFile(FileSystemEntity file) async {
-    String content = await File(file.path).readAsString();
-    // Split the content at the first line break to get the title
-    return content.split('\n').first;
   }
 
   @override
@@ -156,29 +121,6 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Container(
           color: selectedTheme.backgroundColor,
-          child: Column (
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                for (Note? note in notes)
-                  GestureDetector(
-                      onTap: () {
-                        // We'll use it eventually, let's leave it empty for now
-                      },
-                      child: Container(
-                          padding: const EdgeInsets.all(8.0),
-                          margin: const EdgeInsets.only(bottom: 8.0),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: Text(
-                            note?.title ?? "",
-                            style: const TextStyle(fontSize: 18.0),
-                          )
-                      )
-                  )
-              ]
-          )
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
