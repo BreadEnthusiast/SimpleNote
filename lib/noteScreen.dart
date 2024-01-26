@@ -177,8 +177,6 @@ class _NoteScreenState extends State<NoteScreen> {
     await Directory(notesFolderPath).create(recursive: true);
     File noteFile = filePath;
 
-    String existingContent = noteFile.existsSync() ? noteFile.readAsStringSync() : '';
-
     await noteFile.writeAsString('$title\n$note');
 
     widget.onNoteSaved();
