@@ -36,8 +36,6 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-//
-
 class _MyHomePageState extends State<MyHomePage> {
 
   final List<ThemeData> availableThemes = [
@@ -110,6 +108,10 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  void _handleNoteSaved() {
+    _loadNotes();
+  }
+
   void _handleThemeChanged(ThemeData newTheme) {
     setState(() {
       selectedTheme = newTheme;
@@ -117,6 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _loadNotes() async {
+    debugPrint("loading notes");
     List<Note> loadedNotes = [];
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String notesFolderPath = '${documentsDirectory.path}/noteFiles';
@@ -156,7 +159,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => NoteScreen(onThemeChanged: _handleThemeChanged, noteFile: noteFile,)),
+      MaterialPageRoute(builder: (context) => NoteScreen(onThemeChanged: _handleThemeChanged, noteFile: noteFile, onNoteSaved: () { _handleNoteSaved(); },)),
     );
     debugPrint(result);
     _loadNotes(); // Refresh notes when returning from NoteScreen
@@ -236,6 +239,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               MaterialPageRoute(
                                 builder: (context) => NoteScreen(
                                   onThemeChanged: onThemeChanged,
+                                  onNoteSaved: _handleNoteSaved,
                                   initialNote: note,
                                 ),
                               ),

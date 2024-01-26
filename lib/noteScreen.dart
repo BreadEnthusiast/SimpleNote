@@ -18,7 +18,8 @@ class NoteScreen extends StatefulWidget {
   final Function(ThemeData) onThemeChanged;
   final Note? initialNote;
   final File? noteFile;
-  const NoteScreen({Key? key, required this.onThemeChanged, this.noteFile, this.initialNote}) : super(key: key);
+  final Function() onNoteSaved;
+  const NoteScreen({Key? key, required this.onThemeChanged, this.noteFile, this.initialNote, required this.onNoteSaved}) : super(key: key);
 
   @override
   _NoteScreenState createState() => _NoteScreenState();
@@ -75,7 +76,17 @@ class _NoteScreenState extends State<NoteScreen> {
 
   String _readNoteFromFile(String filePath) {
     debugPrint(filePath);
-    return File(filePath).readAsStringSync();
+    String fileContent = File(filePath).readAsStringSync();
+    List<String> lines = fileContent.split('\n');
+
+    // Extract title and note from lines
+    String title = lines.isNotEmpty ? lines.first : '';
+    String note = lines.length > 1 ? lines.sublist(1).join('\n') : '';
+
+    // Set title in the text controller
+    titleController.text = title;
+
+    return note;
   }
 
   // Load selected theme from shared preferences
@@ -166,8 +177,11 @@ class _NoteScreenState extends State<NoteScreen> {
     await Directory(notesFolderPath).create(recursive: true);
     File noteFile = filePath;
 
+    String existingContent = noteFile.existsSync() ? noteFile.readAsStringSync() : '';
+
     await noteFile.writeAsString('$title\n$note');
-    debugPrint('Note saved to: ${noteFile.path}');
+
+    widget.onNoteSaved();
   }
 
   startTimer() {
